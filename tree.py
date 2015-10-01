@@ -35,22 +35,21 @@ class Node(object):
 	def get_used_attribute_list(self):
 		return self.used_attribute_list;
 
-
-
-
 		
-# n=Node(5,[],[])
-# p=Node(6)
-# q=Node(7)
-# n.add_child(p)
-# n.add_child(q)
-# x=Node('a')
-# p.add_child(x)
-# def main(n,x):
-	# if n.children:
-		# print("--",n.data,"--");
-		# for c in n.children:
-			# main(c);
-	# else: print(n.data);
 
-# main(n,0)
+class AttValues(object):
+		map=dict();
+		total_count=0;
+		
+		def __init__(self,map,total_count):
+			self.map=map
+			self.total_count=total_count
+
+
+class AttributeNameMap(object):
+	map=dict()
+	name='';
+	def __init__(self,name,map):
+		self.name=name;
+		self.map=map
+		

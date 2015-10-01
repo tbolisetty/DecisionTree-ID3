@@ -7,12 +7,11 @@ feature_vector_length=0;
 featureVectorList=[]
 def read(train_data_set):
 # ----create list of hashmaps for storing training row data
-	
 	with open(train_data_set) as mush_train:
 		reader=csv.reader(mush_train)
 		for row in reader:
 			featureVectorMap=dict();
-			for x in range(0,23):
+			for x in range(0,len(row)):
 				key='Att_'+str(x);
 				featureVectorMap[key]=row[x];
 				if x==0:
@@ -54,7 +53,6 @@ def construct_tree(node_list):
 							class_value=k;
 						
 				node.set_class_value(attribute_value,class_value)
-
 				continue;
 		# -----if not calculate the next best attribute to divide
 			else:
@@ -93,7 +91,7 @@ def create_node(parent,best_attribute,att_class_map):
 	child.set_attribute_value_map(used_attribute_value_map)
 	return child
 	
-def print_tree(root,space):
+def print_tree(root,att_details,space):
 	attribute=att_details[root.attribute_name]
 	print(attribute.name)
 	
@@ -103,16 +101,14 @@ def print_tree(root,space):
 			for i in range(1,x):
 				print(' ',end="")
 			print(': '+ attribute.map[k]+ ' : '+v,);	
-			# print(': ' + k +' : '+ v,);
 	
 	if root.children:
 		for k,v in root.children.items():
 			for i in range(1,x):
 				print(' ',end="")
 			print(': '+ attribute.map[k] +' : ',end="" )
-			# print(': '+ k +' : ',end="" )
 			space=space+len(attribute.name)+ len(attribute.map[k])+5;
-			print_tree(v,space);
+			print_tree(v,att_details,space);
 
 	
 def find_best_attribute(featureVectorList,considered_attributes):
@@ -126,7 +122,7 @@ def find_best_attribute(featureVectorList,considered_attributes):
 			else:
 				count=1;
 				att_value=featureVectorMap['Att_'+str(x)];
-				class_value=featureVectorMap['Att_'+str(0)];
+				class_value=featureVectorMap['Att_'+str(class_index)];
 				#---if attribute value is present in attribute list then find the class value and increment it
 				if  att_value in att_list[x-1]:
 					att_map_object=att_list[x-1][att_value];
@@ -137,7 +133,7 @@ def find_best_attribute(featureVectorList,considered_attributes):
 				else:
 					map=dict();
 					map[class_value]=count;
-					att_map_object=AttValues(map,1);
+					att_map_object=tree.AttValues(map,1);
 					att_list[x-1][att_value]=att_map_object
 					# att_list[x-1][att_value]=map;
 	i=1;
@@ -150,7 +146,6 @@ def find_best_attribute(featureVectorList,considered_attributes):
 	
 	for att in att_list:
 		name='Att_'+str(i)
-		
 		if not att.items(): #or name in considered_attributes:
 			i+=1;
 			continue;
@@ -162,14 +157,6 @@ def find_best_attribute(featureVectorList,considered_attributes):
 			i+=1;	
 	# ---send best attribute number with its class map 
 	return attribute_information_node,att_list[attribute_information_node-1]
-
-class AttValues(object):
-		map=dict();
-		total_count=0;
-		
-		def __init__(self,map,total_count):
-			self.map=map
-			self.total_count=total_count
 
 def calculate_att_entropy(att_map):
 	att_entropy=0;
@@ -190,13 +177,13 @@ def calculate_entropy(val,sample_space):
 	entropy=-(p*math.log(p,2));
 	return entropy;
 	
-def get_class_hashmap(d):
+def get_class_hashmap(featureVectorList):
 	sample_space=0;
 	entropy=0;
 	hash_class=dict();
 	count=1;
-	for map in d:
-		x=map['Att_'+str(0)];
+	for map in featureVectorList:
+		x=map['Att_'+str(class_index)];
 		if(x in hash_class):
 			count=count+1;
 		hash_class[x]=count;
@@ -222,7 +209,7 @@ def parse(root,test_data_set):
 		reader=csv.reader(mush_train)
 		for row in reader:
 			parse_featureVectorMap=dict();
-			for x in range(0,23):
+			for x in range(0,len(row)):
 				key='Att_'+str(x);
 				parse_featureVectorMap[key]=row[x];
 			parse_featureVectorList.append(parse_featureVectorMap);
@@ -253,7 +240,6 @@ def parse(root,test_data_set):
 								new_class_map[class_v]=class_value_count+new_class_map[class_v];
 							else:
 								new_class_map[class_v]=class_value_count;
-
 				count=0;
 				out_value=0;
 				for k,v in new_class_map.items():
@@ -262,7 +248,7 @@ def parse(root,test_data_set):
 						count=v
 				break;
 		flag='False'
-		if(out_value==parse_featureVectorMap['Att_0']):
+		if(out_value==parse_featureVectorMap['Att_'+str(class_index)]):
 			hits+=1;
 			flag='True';
 		
@@ -274,15 +260,8 @@ def parse(root,test_data_set):
 	output.close()
 	mush_train.close()
 	
-class Attribute(object):
-	map=dict()
-	name='';
-	def __init__(self,name,map):
-		self.name=name;
-		self.map=map
-		
-att_details=dict();		
 def attribute_mapping():
+	att_details=dict();		
 	file=open('D:/ML/Decision Tree/attribute_mapping.txt')
 	x='Att_'
 	i=1;
@@ -291,18 +270,20 @@ def attribute_mapping():
 		att=line.split(": ")
 		name=att[0].split('. ')[1]
 		map={v.rstrip():k for k,v in (x.split('=') for x in att[1].split(','))}
-		attribute_obj=Attribute(name,map)
+		attribute_obj=tree.AttributeNameMap(name,map)
 		att_details['Att_'+str(i)]=attribute_obj
 		i+=1;
 	return att_details
 	
-def main(a):
-	train_data_set= a[1]
-	test_data_set=a[2]
+def main(args):
+	train_data_set= args[1]
+	test_data_set=args[2]
+	global class_index 
+	class_index = args[3]
 	read(train_data_set);
 	parent=decision_tree();
 	att=attribute_mapping();
-	print_tree(parent,1);
+	print_tree(parent,att,1);
 	print('Accuracy of decision tree on training set : ',end="")
 	parse(parent,train_data_set);
 	print('Accuracy of decision tree on test set : ',end="")
