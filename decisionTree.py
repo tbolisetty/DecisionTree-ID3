@@ -91,26 +91,6 @@ def create_node(parent,best_attribute,att_class_map):
 	child.set_attribute_value_map(used_attribute_value_map)
 	return child
 	
-def print_tree(root,att_details,space):
-	attribute=att_details[root.attribute_name]
-	print(attribute.name)
-	
-	x=len(attribute.name)+space
-	if root.class_value:
-		for k,v in root.class_value.items():
-			for i in range(1,x):
-				print(' ',end="")
-			print(': '+ attribute.map[k]+ ' : '+v,);	
-	
-	if root.children:
-		for k,v in root.children.items():
-			for i in range(1,x):
-				print(' ',end="")
-			print(': '+ attribute.map[k] +' : ',end="" )
-			space=space+len(attribute.name)+ len(attribute.map[k])+5;
-			print_tree(v,att_details,space);
-
-	
 def find_best_attribute(featureVectorList,considered_attributes):
 #---creating a list of attribute size with {attribute_value:{class_value:count}}
 	att_list=[{} for _ in range(len(featureVectorList[0])-1)];
@@ -201,10 +181,31 @@ def calculate_class_entropy(hash_class):
 	
 	return class_entropy;
 	
+	
+def print_tree(root,att_details,space):
+	attribute=att_details[root.attribute_name]
+	print(attribute.name)
+	
+	x=len(attribute.name)+space
+	if root.class_value:
+		for k,v in root.class_value.items():
+			for i in range(1,x):
+				print(' ',end="")
+			print(': '+ attribute.map[k]+ ' : '+v,);	
+	
+	if root.children:
+		for k,v in root.children.items():
+			for i in range(1,x):
+				print(' ',end="")
+			print(': '+ attribute.map[k] +' : ',end="" )
+			space=space+len(attribute.name)+ len(attribute.map[k])+5;
+			print_tree(v,att_details,space);
 
+
+	
 def parse(root,test_data_set):
 	parse_featureVectorList=[]
-	output=open('D:/ML/Assg2/mush_output.data','w')
+	output=open('/output.data','w')
 	with open(test_data_set) as mush_train:
 		reader=csv.reader(mush_train)
 		for row in reader:
@@ -260,9 +261,9 @@ def parse(root,test_data_set):
 	output.close()
 	mush_train.close()
 	
-def attribute_mapping():
+def attribute_mapping(attribute_mapping_file):
 	att_details=dict();		
-	file=open('D:/ML/Decision Tree/attribute_mapping.txt')
+	file=open(attribute_mapping_file)
 	x='Att_'
 	i=1;
 	for line in file:
@@ -278,11 +279,12 @@ def attribute_mapping():
 def main(args):
 	train_data_set= args[1]
 	test_data_set=args[2]
+	attribute_mapping_file=args[3]
 	global class_index 
 	class_index =0
 	read(train_data_set);
 	parent=decision_tree();
-	att=attribute_mapping();
+	att=attribute_mapping(attribute_mapping_file);
 	print_tree(parent,att,1);
 	print('Accuracy of decision tree on training set : ',end="")
 	parse(parent,train_data_set);
