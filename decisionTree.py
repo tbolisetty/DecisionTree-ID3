@@ -5,12 +5,8 @@ import sys
 class_value_set=set();
 feature_vector_length=0;
 featureVectorList=[]
-# train_data_set='D:/ML/Assg2/mush_train.data';
-# test_data_set='D:/ML/Assg2/mush_test.data';
-# feature=open('D:/ML/Assg2/featurevector.txt','w')
 def read(train_data_set):
 # ----create list of hashmaps for storing training row data
-	# with open('D:/ML/Assg2/test.data') as mush_train:
 	
 	with open(train_data_set) as mush_train:
 		reader=csv.reader(mush_train)
@@ -32,8 +28,6 @@ def decision_tree():
 	# ---if children map is empty and class map is empty then create tree
 	best_attribute_name='Att_'+str(best_attribute)
 	parent=tree.Node(best_attribute_name,att_class_map,[best_attribute_name],feature_vector_length);
-	
-	# construct_tree(parent.children);
 	construct_tree([parent]);
 	return parent
 	
@@ -58,24 +52,19 @@ def construct_tree(node_list):
 					for k,v in attribute_class_map.map.items():
 						if class_count<v:
 							class_value=k;
-					
-					# class_value=class_value_list[0];
 						
 				node.set_class_value(attribute_value,class_value)
 
-				# print('leaf node ' + node.attribute_name + ' attribute value ' + attribute_value + ' class '+ class_value)
 				continue;
 		# -----if not calculate the next best attribute to divide
 			else:
 				used_attribute_value_map=node.get_attribute_value_map()
 				used_attribute_value_map[node.attribute_name]=attribute_value;
-				# print(used_attribute_value_map)
 				new_featureVectorList=[]
 				# ---get all featurevectors for which are not used after matching with the used_attribute_list 
 				for featureVectorMap in featureVectorList:		
 					matched_attributes=set(featureVectorMap.items())&set(node.used_attribute_value_map.items())
 					if (matched_attributes==set(node.used_attribute_value_map.items())) :
-						# print(featureVectorMap)
 						new_featureVectorList.append(featureVectorMap)
 				
 				# --- find best attribute from new featureVectorList
@@ -88,10 +77,6 @@ def construct_tree(node_list):
 		
 		# ---add for unknown attribute 
 		# -----
-		# node.set_class_value(attribute_value,class_value)
-	# print('----next level---')
-	# for c in bfs_list:
-		# print(c.attribute_name)
 	# --- call the construct_tree for the new bfs_list again 
 	construct_tree(bfs_list)
 	# ----add the best attribute in the nodes used_attribute_list 
@@ -109,10 +94,6 @@ def create_node(parent,best_attribute,att_class_map):
 	return child
 	
 def print_tree(root,space):
-	# for i in range(1,space):
-		# print('  ',end="")
-
-		
 	attribute=att_details[root.attribute_name]
 	print(attribute.name)
 	
@@ -136,7 +117,6 @@ def print_tree(root,space):
 	
 def find_best_attribute(featureVectorList,considered_attributes):
 #---creating a list of attribute size with {attribute_value:{class_value:count}}
-	# print(considered_attributes)
 	att_list=[{} for _ in range(len(featureVectorList[0])-1)];
 	for featureVectorMap in featureVectorList:
 		for x in range(1,len(featureVectorMap)):
@@ -160,7 +140,6 @@ def find_best_attribute(featureVectorList,considered_attributes):
 					att_map_object=AttValues(map,1);
 					att_list[x-1][att_value]=att_map_object
 					# att_list[x-1][att_value]=map;
-		# print(x)
 	i=1;
 	max_information_gain=0;
 	attribute_information_node=1;
@@ -170,8 +149,6 @@ def find_best_attribute(featureVectorList,considered_attributes):
 	class_entropy=calculate_class_entropy(class_hashmap);
 	
 	for att in att_list:
-		# i+=1;
-		# print(calculate_att_entropy(att))
 		name='Att_'+str(i)
 		
 		if not att.items(): #or name in considered_attributes:
@@ -193,7 +170,6 @@ class AttValues(object):
 		def __init__(self,map,total_count):
 			self.map=map
 			self.total_count=total_count
-			
 
 def calculate_att_entropy(att_map):
 	att_entropy=0;
@@ -267,33 +243,16 @@ def parse(root,test_data_set):
 					val = parse_featureVectorMap[parent.attribute_name]
 			# ---attribute value not present in node
 			else:
-				# print()
 				# ---find maximum probability child value and assign
 				new_class_map=dict();
 				
 				for att_value,class_map in parent.attribute_value_map.items():
 					if att_value in parent.class_value:
 						for class_v,class_value_count in class_map.map.items():
-							# print(class_map.map, end="")
 							if class_v in new_class_map:
 								new_class_map[class_v]=class_value_count+new_class_map[class_v];
 							else:
 								new_class_map[class_v]=class_value_count;
-						
-				
-				# for att_value,class_map in parent.attribute_value_map.items():
-					# for class_value,class_value_count in class_map.map.items():
-						# print(class_map.map, end="")
-						# if class_value in new_class_map:
-							# new_class_map[class_value]=class_value_count+new_class_map[class_value];
-						# else:
-							# new_class_map[class_value]=class_value_count;
-				
-				# for att_value,class_value in parent.class_value.items():
-					# count=1;
-					# if class_value in new_class_map:
-						# count=count+new_class_map[class_value];
-					# new_class_map[class_value]=count;
 
 				count=0;
 				out_value=0;
@@ -301,10 +260,6 @@ def parse(root,test_data_set):
 					if v>count:
 						out_value=k
 						count=v
-					# elif count==v:
-						# out_value='p'
-				# out_value=out_value
-				# output.write(str(count)+",");
 				break;
 		flag='False'
 		if(out_value==parse_featureVectorMap['Att_0']):
@@ -329,23 +284,19 @@ class Attribute(object):
 att_details=dict();		
 def attribute_mapping():
 	file=open('D:/ML/Decision Tree/attribute_mapping.txt')
-	# reader=file.read()
 	x='Att_'
 	i=1;
 	for line in file:
 		att_value_map=dict();
 		att=line.split(": ")
 		name=att[0].split('. ')[1]
-		# att[1].rstrip()
 		map={v.rstrip():k for k,v in (x.split('=') for x in att[1].split(','))}
-		# print(name,map)
 		attribute_obj=Attribute(name,map)
 		att_details['Att_'+str(i)]=attribute_obj
 		i+=1;
 	return att_details
 	
 def main(a):
-	# print(a[1], a[2])
 	train_data_set= a[1]
 	test_data_set=a[2]
 	read(train_data_set);
