@@ -279,7 +279,7 @@ def main(args):
 	train_data_set= args[1]
 	test_data_set=args[2]
 	global class_index 
-	class_index = args[3]
+	class_index =0
 	read(train_data_set);
 	parent=decision_tree();
 	att=attribute_mapping();
