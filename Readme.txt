@@ -1,7 +1,7 @@
 ID3 Algorithm for Decision Tree Implementation designed in Python
 Class Value is considered to be the first column in the training and test data sets
 It accepts three inputs files : training data set, test data set and attribute mapping file
-
+Link to the sample data where you can find its details: https://archive.ics.uci.edu/ml/datasets/Mushroom 
 System Requirements to run : python 3.5.0
 Command to run: 
 	Navigate to the path where python files are present
